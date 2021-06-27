@@ -1,3 +1,5 @@
+import base64
+
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import hashes
 from flask import Flask
@@ -10,10 +12,13 @@ private_key = rsa.generate_private_key(
     key_size=2048,
 )
 
+articleTitle = b"BREAKING NEWS: Royal Holloway is a University"
+articleContent = b"This is a test message to see if it works with Flask."
+articleAuthor = b"Aedan Lawrence"
 
-article = b"This is a test message to see if it works with Flask."
+fullArticle = articleTitle + articleContent + articleAuthor
 
-sig = private_key.sign(article,
+sig = private_key.sign(fullArticle,
                        padding.PSS(
                            mgf=padding.MGF1(hashes.SHA256()),
                            salt_length=padding.PSS.MAX_LENGTH
@@ -23,7 +28,10 @@ sig = private_key.sign(article,
 
 @app.route('/')
 def encrypted():
-    return sig
+    return{'Signature': sig.hex(),
+           'articleContent': articleContent.decode("utf-8"),
+           'articleAuthor': articleAuthor.decode("utf-8"),
+           'articleTitle': articleTitle.decode("utf-8")}
 
 
 @app.route('/verify')
@@ -32,7 +40,7 @@ def decrypted():
         public_key = private_key.public_key()
         public_key.verify(
             sig,
-            article,
+            fullArticle,
             padding.PSS(
                 mgf=padding.MGF1(hashes.SHA256()),
                 salt_length=padding.PSS.MAX_LENGTH
