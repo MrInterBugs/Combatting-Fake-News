@@ -1,22 +1,21 @@
-import base64
-
 from cryptography.exceptions import InvalidSignature
+from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.serialization import load_pem_private_key
 from flask import Flask
-from cryptography.hazmat.primitives.asymmetric import rsa, padding
+from cryptography.hazmat.primitives.asymmetric import padding
 
 app = Flask(__name__)
 
-private_key = rsa.generate_private_key(
-    public_exponent=65537,
-    key_size=2048,
-)
+with open("test.pem", 'rb') as pem_in:
+    pemlines = pem_in.read()
+private_key = load_pem_private_key(pemlines, None, default_backend())
 
-articleTitle = b"BREAKING NEWS: Royal Holloway is a University"
-articleContent = b"This is a test message to see if it works with Flask."
-articleAuthor = b"Aedan Lawrence"
+articleTitle = "BREAKING NEWS: Royal Holloway is a University"
+articleContent = "This is a test message to see if it works with Flask."
+articleAuthor = "Aedan Lawrence"
 
-fullArticle = articleTitle + articleContent + articleAuthor
+fullArticle = str.encode(articleTitle) + str.encode(articleContent) + str.encode(articleAuthor)
 
 sig = private_key.sign(fullArticle,
                        padding.PSS(
@@ -29,9 +28,9 @@ sig = private_key.sign(fullArticle,
 @app.route('/')
 def encrypted():
     return{'Signature': sig.hex(),
-           'articleContent': articleContent.decode("utf-8"),
-           'articleAuthor': articleAuthor.decode("utf-8"),
-           'articleTitle': articleTitle.decode("utf-8")}
+           'articleContent': articleContent,
+           'articleAuthor': articleAuthor,
+           'articleTitle': articleTitle}
 
 
 @app.route('/verify')
