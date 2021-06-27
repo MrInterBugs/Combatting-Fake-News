@@ -1,0 +1,6 @@
+Need to store private RSA keys in a database.
+  - ID
+  - RSA PEM Information
+
+When a request is made JSON should be returned which has been signed by the server.
+Devices should have the public keys to decrypt the news.

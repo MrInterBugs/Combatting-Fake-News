@@ -9,13 +9,9 @@ private_key = rsa.generate_private_key(
     public_exponent=65537,
     key_size=2048,
 )
-private_key2 = rsa.generate_private_key(
-    public_exponent=65537,
-    key_size=2048,
-)
+
 
 article = b"This is a test message to see if it works with Flask."
-article2 = b"This is a test message to see if it works with Flask."
 
 sig = private_key.sign(article,
                        padding.PSS(
@@ -23,13 +19,6 @@ sig = private_key.sign(article,
                            salt_length=padding.PSS.MAX_LENGTH
                        ),
                        hashes.SHA256())
-
-sig2 = private_key2.sign(article2,
-                         padding.PSS(
-                             mgf=padding.MGF1(hashes.SHA256()),
-                             salt_length=padding.PSS.MAX_LENGTH
-                         ),
-                         hashes.SHA256())
 
 
 @app.route('/')
