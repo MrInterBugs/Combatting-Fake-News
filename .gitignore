@@ -1,0 +1,5 @@
+# Default ignored files
+/Python Flask Enviroment/.idea/
+/Python Flask Enviroment/__pycache__/
+/Python Flask Enviroment/venv/
+/Report/
