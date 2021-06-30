@@ -1,3 +1,4 @@
+"""Used to verify the authenticity of provided news to a source."""
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
@@ -12,6 +13,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def encrypted():
+    """Returns the a json of the article and the included signature."""
     return {'Signature': SIGNATURE.hex(),
             'articleContent': ARTICLE_CONTENT,
             'articleAuthor': ARTICLE_AUTHOR,
@@ -21,6 +23,7 @@ def encrypted():
 
 @app.route('/verify')
 def decrypted():
+    """Quick example to make sure the the signature matches."""
     try:
         public_key = PRIVATE_KEY.public_key()
         public_key.verify(
@@ -38,6 +41,7 @@ def decrypted():
 
 
 def sign_news(private_key, full_article):
+    """Returns the signature of RSA signing the news article and other information together."""
     return private_key.sign(full_article,
                             padding.PSS(
                                 mgf=padding.MGF1(hashes.SHA256()),
@@ -47,6 +51,7 @@ def sign_news(private_key, full_article):
 
 
 def read_key(publisher):
+    """Used to read the private keys from the database."""
     private_key = str(PrivateKey.query.filter_by(publisher=publisher).first()).encode()
     return load_pem_private_key(private_key, None, default_backend())
 

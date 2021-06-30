@@ -1,3 +1,4 @@
+"""Used to populate the database as and when needed."""
 from database import db, PrivateKey
 
 db.create_all()

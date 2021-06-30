@@ -1,3 +1,4 @@
+"""Defines the constraints of the database"""
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
@@ -8,6 +9,7 @@ db = SQLAlchemy(app)
 
 
 class PrivateKey(db.Model):
+    """This is the table which contains the keys for the publishers."""
     id = db.Column(db.Integer, primary_key=True)
     publisher = db.Column(db.String(80), unique=True, nullable=False)
     private_key = db.Column(db.String(2100), unique=True, nullable=False)
