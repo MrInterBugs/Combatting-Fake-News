@@ -19,7 +19,7 @@ class PrivateKey(db.Model):
 
 
 class NewsArticle(db.Model):
-    """This is the table which contains the keys for the publishers."""
+    """This is the table which contains different news articles"""
     id = db.Column(db.Integer, primary_key=True)
     publisher = db.Column(db.String(80), unique=True, nullable=False)
     author = db.Column(db.String(80), unique=True, nullable=False)
