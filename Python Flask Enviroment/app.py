@@ -5,7 +5,7 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.serialization import load_pem_private_key
 
-from flask import Flask
+from flask import Flask, request
 from database import PrivateKey
 
 app = Flask(__name__)
@@ -14,6 +14,8 @@ app = Flask(__name__)
 @app.route('/')
 def encrypted():
     """Returns the a json of the article and the included signature."""
+    article = request.args.get('article')
+    print(article)
     return {'Signature': SIGNATURE.hex(),
             'articleContent': ARTICLE_CONTENT,
             'articleAuthor': ARTICLE_AUTHOR,
