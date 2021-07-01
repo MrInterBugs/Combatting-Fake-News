@@ -2,7 +2,7 @@
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.serialization import load_pem_private_key
 
 from flask import Flask, request
@@ -31,11 +31,7 @@ def decrypted():
         public_key.verify(
             SIGNATURE,
             FULL_ARTICLE,
-            padding.PSS(
-                mgf=padding.MGF1(hashes.SHA256()),
-                salt_length=padding.PSS.MAX_LENGTH
-            ),
-            hashes.SHA256()
+            ec.ECDSA(hashes.SHA256())
         )
         return "Valid"
     except InvalidSignature:
@@ -43,13 +39,10 @@ def decrypted():
 
 
 def sign_news(private_key, full_article):
-    """Returns the signature of RSA signing the news article and other information together."""
+    """Returns the signature of ECDSA signing the news article and other information together."""
     return private_key.sign(full_article,
-                            padding.PSS(
-                                mgf=padding.MGF1(hashes.SHA256()),
-                                salt_length=padding.PSS.MAX_LENGTH
-                            ),
-                            hashes.SHA256())
+                            ec.ECDSA(hashes.SHA256())
+                            )
 
 
 def read_key(publisher):
