@@ -29,6 +29,7 @@ class PrivateKey(db.Model):
 
 
 GUARDIAN_API_KEY = "e75ca83b-5396-4d64-85b5-598ba5eff24a"
+NYTIMES_API_KEY = "PLhsHNcQaagOwo1u6wp4f6KwgYeOlA4E"
 
 
 @app.route('/')
@@ -37,9 +38,9 @@ def encrypted():
     try:
         article = request.args.get('article')
 
-        if 'theguardian' in article:
+        if 'https://www.theguardian.com/' in article:
             response = urlopen('https://content.guardianapis.com/' + (
-                article.split(".com/", 1)[1]) + '?api-key=e75ca83b-5396-4d64-85b5-598ba5eff24a')
+                article.split(".com/", 1)[1]) + '?api-key=' + GUARDIAN_API_KEY)
 
             json_obj = json.loads(response.read().decode('utf-8'))
             private_key = read_key("Guardian")
@@ -47,10 +48,26 @@ def encrypted():
 
             return {'Signature': signature.hex(),
                     'Article': json_obj}
+
+        if 'https://www.nytimes.com/' in article:
+            response = urlopen('https://api.nytimes.com/svc/mostpopular/v2/emailed/7.json?api-key=' + NYTIMES_API_KEY)
+
+            json_obj = json.loads(response.read().decode('utf-8'))
+            top20 = json_obj['results']
+
+            for each in top20:
+                if each['url'] == article:
+                    private_key = read_key("NYTimes")
+                    signature = sign_news(private_key, bytes(article.encode('utf-8')))
+
+                    return {'Signature': signature.hex(),
+                            'URL': article}
+            else:
+                return {'Status': 'Trusted Source, Not Verifiable'}
         else:
-            return {'Status': 'Untrusted Source'}
+            return {'Status': 'Untrusted Source.'}
     except HTTPError:
-        return {'Status': 'Something went wrong'}
+        return {'Status': 'Something went wrong.'}
 
 
 def sign_news(private_key, full_article):
