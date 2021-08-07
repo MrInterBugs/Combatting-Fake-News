@@ -5,7 +5,7 @@ from urllib.error import HTTPError
 from urllib.request import urlopen
 
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.serialization import load_pem_private_key
 
@@ -66,6 +66,16 @@ def encrypted():
                 return {'Status': 'Trusted Source, Not Verifiable'}
         else:
             return {'Status': 'Untrusted Source.'}
+    except HTTPError:
+        return {'Status': 'Something went wrong.'}
+
+
+@app.route('/publickey')
+def public():
+    try:
+        publisher = request.args.get('publisher')
+        private_key = read_key(publisher)
+        return private_key.public_key().public_bytes(serialization.Encoding.DER, serialization.PublicFormat.SubjectPublicKeyInfo)
     except HTTPError:
         return {'Status': 'Something went wrong.'}
 
