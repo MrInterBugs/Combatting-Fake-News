@@ -40,6 +40,7 @@ def encrypted():
 
         if 'https://www.theonion.com/' in article:
             return {'Parody': True,
+                    'Publisher': 'Onion',
                     'Article': article}
 
         if 'https://www.theguardian.com/' in article:
@@ -51,6 +52,7 @@ def encrypted():
             signature = sign_news(private_key, bytes(response))
 
             return {'Signature': signature.hex(),
+                    'Publisher': 'Guardian',
                     'Article': json_obj}
 
         if 'https://www.nytimes.com/' in article:
@@ -65,6 +67,7 @@ def encrypted():
                     signature = sign_news(private_key, bytes(article.encode('utf-8')))
 
                     return {'Signature': signature.hex(),
+                            'Publisher': 'NYTimes',
                             'URL': article}
             else:
                 return {'Status': 'Trusted Source, Not Verifiable'}
