@@ -38,6 +38,10 @@ def encrypted():
     try:
         article = request.args.get('article')
 
+        if 'https://www.theonion.com/' in article:
+            return {'Parody': True,
+                    'Article': article}
+
         if 'https://www.theguardian.com/' in article:
             response = urlopen('https://content.guardianapis.com/' + (
                 article.split(".com/", 1)[1]) + '?api-key=' + GUARDIAN_API_KEY)
