@@ -84,7 +84,7 @@ def public():
         publisher = request.args.get('publisher')
         private_key = read_key(publisher)
         public_key = private_key.public_key()
-        key_bytes = public_key.public_bytes(serialization.Encoding.DER)
+        key_bytes = public_key.public_bytes(serialization.Encoding.DER, serialization.PublicFormat.SubjectPublicKeyInfo)
         return (base64.b64encode(key_bytes)).decode('ascii')
     except HTTPError:
         return {'Status': 'Something went wrong.'}
