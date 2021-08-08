@@ -1,4 +1,5 @@
 """Used to verify the authenticity of provided news to a source."""
+import base64
 import json
 
 from urllib.error import HTTPError
@@ -49,9 +50,9 @@ def encrypted():
 
             json_obj = json.loads(response.read().decode('utf-8'))
             private_key = read_key("Guardian")
-            signature = sign_news(private_key, bytes(response))
+            signature = sign_news(private_key, bytes(article.encode('utf-8')))
 
-            return {'Signature': signature.hex(),
+            return {'Signature': (base64.b64encode(signature)).decode('ascii'),
                     'Publisher': 'Guardian',
                     'Article': json_obj}
 
@@ -66,7 +67,7 @@ def encrypted():
                     private_key = read_key("NYTimes")
                     signature = sign_news(private_key, bytes(article.encode('utf-8')))
 
-                    return {'Signature': signature.hex(),
+                    return {'Signature': (base64.b64encode(signature)).decode('ascii'),
                             'Publisher': 'NYTimes',
                             'URL': article}
             else:
@@ -82,7 +83,9 @@ def public():
     try:
         publisher = request.args.get('publisher')
         private_key = read_key(publisher)
-        return private_key.public_key().public_bytes(serialization.Encoding.DER, serialization.PublicFormat.SubjectPublicKeyInfo)
+        public_key = private_key.public_key()
+        key_bytes = public_key.public_bytes(serialization.Encoding.DER)
+        return (base64.b64encode(key_bytes)).decode('ascii')
     except HTTPError:
         return {'Status': 'Something went wrong.'}
 
