@@ -38,9 +38,10 @@ def encrypted():
     """Returns the a json of the article and the included signature."""
     try:
         article = request.args.get('article')
+        private_key = read_key("Server")
 
         if 'https://www.theonion.com/' in article:
-            return {'Parody': True,
+            return {'Satire': True,
                     'Publisher': 'Onion',
                     'Article': article}
 
@@ -49,9 +50,8 @@ def encrypted():
                 article.split(".com/", 1)[1]) + '?api-key=' + GUARDIAN_API_KEY)
 
             json_obj = json.loads(response.read().decode('utf-8'))
-            private_key = read_key("Guardian")
-            signature = sign_news(private_key, bytes(article.encode('utf-8')))
 
+            signature = sign_news(private_key, bytes(article.encode('utf-8')))
             return {'Signature': (base64.b64encode(signature)).decode('ascii'),
                     'Publisher': 'Guardian',
                     'Article': json_obj}
@@ -64,9 +64,7 @@ def encrypted():
 
             for each in top20:
                 if each['url'] == article:
-                    private_key = read_key("NYTimes")
                     signature = sign_news(private_key, bytes(article.encode('utf-8')))
-
                     return {'Signature': (base64.b64encode(signature)).decode('ascii'),
                             'Publisher': 'NYTimes',
                             'URL': article}
@@ -74,18 +72,6 @@ def encrypted():
                 return {'Status': 'Trusted Source, Not Verifiable'}
         else:
             return {'Status': 'Untrusted Source.'}
-    except HTTPError:
-        return {'Status': 'Something went wrong.'}
-
-
-@app.route('/publickey')
-def public():
-    try:
-        publisher = request.args.get('publisher')
-        private_key = read_key(publisher)
-        public_key = private_key.public_key()
-        key_bytes = public_key.public_bytes(serialization.Encoding.DER, serialization.PublicFormat.SubjectPublicKeyInfo)
-        return (base64.b64encode(key_bytes)).decode('ascii')
     except HTTPError:
         return {'Status': 'Something went wrong.'}
 
