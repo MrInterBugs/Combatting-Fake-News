@@ -19,16 +19,7 @@ class PrivateKey(db.Model):
 
 
 db.create_all()
-nytimes = PrivateKey(publisher='NYTimes',
-                     private_key='-----BEGIN EC PRIVATE KEY-----\nMHQCAQEEIG5Ygav5hReJ9WZvPJHa3r9fVyd9JxHJUi0kUu4tLvugoAcGBSuBBAAK\noUQDQgAEo7fcExc3v9kdF0lCMCMtrcIqU03AjHfu1UHNYClO3EvMF9wtKYUb1F2L\nOe4RuQaMeTxlptyDqaijN3zbJZ2S6Q==\n-----END EC PRIVATE KEY-----')
-bbc = PrivateKey(publisher='BBC',
-                 private_key='-----BEGIN EC PRIVATE KEY-----\nMHQCAQEEIAJNcYYp63fPZUWTy+tWosDfu8De9coRoofeeDOU2J3joAcGBSuBBAAK\noUQDQgAEp1h8PZuoY3oD83bC9I/kxj/SVfLK41e0FlX/sLM8F9/jetRTtgC4WM89\n23rJxQ9p3s79CL5+xha3oOfpriCAmA==\n-----END EC PRIVATE KEY-----')
-ft = PrivateKey(publisher='Financial Times',
-                private_key='-----BEGIN EC PRIVATE KEY-----\nMHQCAQEEIKtFHMrBzAhMQiNFW/kRpZVZSQGEj3QeApyU1d7Vq0k3oAcGBSuBBAAK\noUQDQgAEMwzhviezqpfVc+OBoJOlMzVkpJUrqq7TBo7+ALReehlT1s0SYKbR+Kwe\nOYUWhOpCdk9QWSdW7xxI1kBRVaiu3w==\n-----END EC PRIVATE KEY-----')
-guardian = PrivateKey(publisher='Guardian',
-                      private_key='-----BEGIN EC PRIVATE KEY-----\nMHQCAQEEIMMTKdk0xZXDoRVpV7y2HJz8p1syzt4IYb3EdpHA0Q5JoAcGBSuBBAAK\noUQDQgAELkQAGX3lFaxZU/2l8NdPp0GK9Cpgi5UaVYfoPEookXzgeWjVlX+tZIp8\ngqzuXERbPeX5opbXkTaQ/dvvY2UCJg==\n-----END EC PRIVATE KEY-----')
-db.session.add(bbc)
-db.session.add(ft)
-db.session.add(guardian)
-db.session.add(nytimes)
+server = PrivateKey(publisher='Server',
+                    private_key='-----BEGIN EC PRIVATE KEY-----\nMHcCAQEEIObwTwlLFrqf8XTXQAT90AZ7WfrgCa5l7A0U286T63CkoAoGCCqGSM49\nAwEHoUQDQgAELDIqPmr5Oxklns5GgKTLrxfS0WcKIjaCCW2ZsjBpwxcnQAItqUKS\nh5GCfj0tW6jVm4adiCCAKIDOBWhvIYqZ1Q==\n-----END EC PRIVATE KEY-----')
+db.session.add(server)
 db.session.commit()
