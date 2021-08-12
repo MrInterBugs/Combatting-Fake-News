@@ -11,7 +11,7 @@ import requests as requests
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import ec
-from cryptography.hazmat.primitives.serialization import load_pem_public_key, load_pem_private_key
+from cryptography.hazmat.primitives.serialization import load_pem_private_key
 
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
@@ -41,16 +41,12 @@ PRIVATE_KEY = load_pem_private_key("-----BEGIN EC PRIVATE "
                                    "\nh5GCfj0tW6jVm4adiCCAKIDOBWhvIYqZ1Q==\n-----END EC PRIVATE KEY-----".encode(),
                                    None, default_backend())
 
+
 @app.route('/')
 def encrypted():
     """Returns the a json of the article and the included signature."""
     try:
         article = request.args.get('article')
-
-        if 'https://www.theonion.com/' in article:
-            return {'Satire': True,
-                    'Publisher': 'Onion',
-                    'Article': article}
 
         if 'https://www.theguardian.com/' in article:
             response = urlopen('https://content.guardianapis.com/' + (
@@ -80,19 +76,14 @@ def encrypted():
                             'URL': article}
             else:
                 return {'Status': 'Trusted Source, Not Verifiable'}
+
+        if 'https://www.theonion.com/' in article:
+            return {'Satire': True,
+                    'Publisher': 'Onion',
+                    'Article': article}
+
         else:
-            parsed = urlparse(article).netloc
-            cert = ssl.get_server_certificate((parsed, 443))
-            if cert == read_key(parsed):
-                response = requests.get(article)
-                if response.ok:
-                    signature = sign_news(PRIVATE_KEY, bytes(article.encode('utf-8')))
-                    return {'Signature': (base64.b64encode(signature)).decode('ascii'),
-                            'Publisher': 'FT',
-                            'URL': article}
-                return {'Status': 'Trusted Source, Not Verifiable'}
-            else:
-                return {'Status': 'Untrusted Source.'}
+            return check_other(article)
     except HTTPError:
         return {'Status': 'Something went wrong.'}
 
@@ -107,6 +98,21 @@ def sign_news(private_key, full_article):
 def read_key(publisher):
     """Used to read the private keys from the database."""
     return str(Keys.query.filter_by(publisher=publisher).first())
+
+
+def check_other(article):
+    parsed = urlparse(article).netloc
+    cert = ssl.get_server_certificate((parsed, 443))
+    if cert == read_key(parsed):
+        response = requests.get(article)
+        if response.ok:
+            signature = sign_news(PRIVATE_KEY, bytes(article.encode('utf-8')))
+            return {'Signature': (base64.b64encode(signature)).decode('ascii'),
+                    'Publisher': parsed,
+                    'URL': article}
+        return {'Status': 'Possible Trusted Source, Not Verifiable'}
+    else:
+        return {'Status': 'Untrusted Source.'}
 
 
 if __name__ == '__main__':
