@@ -1,9 +1,0 @@
-\babel@toc {english}{}
-\contentsline {section}{\numberline {1}Abstract}{ii}{section.1}%
-\contentsline {section}{\numberline {2}Introduction}{iii}{section.2}%
-\contentsline {section}{\numberline {3}Development and Difficulties}{v}{section.3}%
-\contentsline {subsection}{\numberline {3.1}Flask Server}{v}{subsection.3.1}%
-\contentsline {subsection}{\numberline {3.2}Signal Application}{v}{subsection.3.2}%
-\contentsline {section}{\numberline {4}Conclusions}{vii}{section.4}%
-\contentsline {section}{\numberline {5}Appendix: Code used in Development}{viii}{section.5}%
-\contentsline {section}{References}{viii}{section*.2}%
